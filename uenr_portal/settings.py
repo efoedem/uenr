@@ -9,9 +9,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-change-me-in-p
 
 # Debug defaults ON for local development; OFF automatically in production
 # (whenever DATABASE_URL points at a hosted database) unless DEBUG is set.
-DEBUG = os.environ.get(
-    "DEBUG", "false" if os.environ.get("DATABASE_URL") else "true"
-).lower() == "true"
+DEBUG = "True"
 
 ALLOWED_HOSTS = ["*"]
 
