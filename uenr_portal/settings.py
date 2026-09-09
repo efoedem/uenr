@@ -6,11 +6,13 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-change-me-in-production")
+
 # Debug defaults ON for local development; OFF automatically in production
 # (whenever DATABASE_URL points at a hosted database) unless DEBUG is set.
 DEBUG = os.environ.get(
     "DEBUG", "false" if os.environ.get("DATABASE_URL") else "true"
 ).lower() == "true"
+
 ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
@@ -25,7 +27,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # Serves static files directly in serverless environment
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -73,19 +75,23 @@ TIME_ZONE = "Africa/Accra"
 USE_I18N = True
 USE_TZ = True
 
+# --- Static Files & WhiteNoise Configuration --------------------------------
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
 STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
     "staticfiles": {
-        # No manifest: WhiteNoise can serve assets even if collectstatic
-        # has not run (which is the case on Vercel's serverless build).
         "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
-# Serve files straight from static/ when staticfiles/ is missing.
-WHITENOISE_USE_FINDERS = True
-WHITENOISE_AUTOREFRESH = True
+
+# Disabled finders and autorefresh to ensure static files serve directly from STATIC_ROOT on Vercel
+WHITENOISE_USE_FINDERS = False
+WHITENOISE_AUTOREFRESH = False
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -94,10 +100,6 @@ LOGIN_REDIRECT_URL = "/dashboard/"
 LOGOUT_REDIRECT_URL = "/"
 
 # --- Email (password reset) -------------------------------------------------
-# By default reset links are printed in the terminal running `runserver`, so
-# you can test without any mail account. To send real email, set these
-# environment variables (e.g. a Gmail App Password) before starting the server:
-#   EMAIL_HOST_USER, EMAIL_HOST_PASSWORD  (optional: EMAIL_HOST, EMAIL_PORT)
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
 EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
 EMAIL_USE_TLS = True
