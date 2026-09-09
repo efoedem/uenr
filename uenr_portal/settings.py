@@ -89,8 +89,8 @@ STORAGES = {
     },
 }
 
-# Disabled finders and autorefresh to ensure static files serve directly from STATIC_ROOT on Vercel
-WHITENOISE_USE_FINDERS = False
+# Allow WhiteNoise to serve directly from static/ when collectstatic hasn't run
+WHITENOISE_USE_FINDERS = True
 WHITENOISE_AUTOREFRESH = False
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
