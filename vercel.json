@@ -1,0 +1,9 @@
+{
+  "buildCommand": "python3 manage.py migrate --noinput && python3 manage.py collectstatic --noinput",
+  "builds": [
+    { "src": "uenr_portal/wsgi.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "uenr_portal/wsgi.py" }
+  ]
+}
